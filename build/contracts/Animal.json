@@ -1,0 +1,4879 @@
+{
+  "contractName": "Animal",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "food",
+          "type": "string"
+        }
+      ],
+      "name": "eat",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "sleep",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "speak",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "metadata": "{\"compiler\":{\"version\":\"0.8.18+commit.87f61d96\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"string\",\"name\":\"food\",\"type\":\"string\"}],\"name\":\"eat\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"sleep\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"speak\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"project:/contracts/AnimalsOOP.sol\":\"Animal\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"project:/contracts/AnimalsOOP.sol\":{\"keccak256\":\"0x77b089d89ba3fd156556f94293ba88707b02503b579008ccf5854c09c58ae765\",\"urls\":[\"bzz-raw://e6512a1d37d053907a43a64850146c4761798e17b3cb1f915ecc328d19b70e55\",\"dweb:/ipfs/QmSmXfahMp7hJBnkUt7B8L24ZVQC6Kq277gzK6nxGWu3KE\"]}},\"version\":1}",
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "immutableReferences": {},
+  "generatedSources": [],
+  "deployedGeneratedSources": [],
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "pragma solidity ^0.8.17;\r\n\r\ninterface Living {\r\n    function eat(string memory food) external returns (string memory);\r\n    function sleep() external returns (string memory);\r\n    function speak() external returns (string memory);\r\n}\r\n\r\ncontract HasName {\r\n    string internal _name;\r\n\r\n    constructor(string memory name) {\r\n        _name = name;\r\n    }\r\n\r\n    function getName() view public returns (string memory){\r\n        return _name;\r\n    }\r\n}\r\n\r\ncontract HasAge {\r\n    uint internal _age;\r\n\r\n    constructor(uint age) {\r\n        _age = age;\r\n    }\r\n\r\n    function getAge() view public returns (uint) {\r\n        return _age;\r\n    }\r\n}\r\n\r\nabstract contract Animal is Living {\r\n\r\n    function eat(string memory food) view virtual public returns (string memory) {\r\n        return string.concat(string.concat(\"Animal eats \",food));\r\n    }\r\n\r\n    function sleep() view public virtual returns (string memory) {\r\n        return \"ZzZzZz...\";\r\n    }\r\n    \r\n    function speak() view public virtual returns (string memory) {\r\n        return \".....\";\r\n    }\r\n}\r\n\r\nlibrary StringComparer {\r\n\r\n   function compare(string memory str1, string memory str2) public pure returns (bool) {\r\n        return keccak256(abi.encodePacked(str1)) == keccak256(abi.encodePacked(str2));\r\n    }\r\n    \r\n}\r\n\r\nabstract contract Herbivore is Animal, HasName, HasAge {\r\n    string constant PLANT = \"plant\";\r\n\r\n    modifier eatOnlyPlant(string memory food) {\r\n        require(StringComparer.compare(food, PLANT), \"Herbivores eat only plants.\");\r\n        _;\r\n    }\r\n\r\n    function eat(string memory food) view virtual override public eatOnlyPlant(food) returns (string memory) {\r\n        return super.eat(food);\r\n    }\r\n}\r\n\r\nabstract contract Carnivore is Animal, HasName, HasAge {\r\n    string constant MEAT = \"meat\";\r\n\r\n    modifier eatOnlyMeat(string memory food) {\r\n        require(StringComparer.compare(food, MEAT), \"Carnivores eat only meat.\");\r\n        _;\r\n    }\r\n    \r\n    function eat(string memory food) view public virtual override eatOnlyMeat(food) returns (string memory) {\r\n        return super.eat(food);\r\n    }\r\n}\r\n\r\nabstract  contract Omnivore is Animal, HasName, HasAge{\r\n    string constant MEAT = \"meat\";\r\n    string constant PLANT = \"plant\";\r\n\r\n    modifier eatBoth(string memory food) {\r\n        require(StringComparer.compare(food, MEAT) || StringComparer.compare(food, PLANT), \"Omnivores eat plant or meat\");\r\n        _;\r\n    }\r\n\r\n    function eat(string memory food) view public virtual override eatBoth(food) returns (string memory) {\r\n        return super.eat(food);\r\n    }\r\n}\r\n\r\n\r\n\r\ncontract Cow is Herbivore {\r\n\r\n    constructor(string memory name, uint age) HasName(name) HasAge(age){\r\n    }\r\n\r\n    function speak() view public override returns (string memory) {\r\n        return \"Moooo...\";\r\n    }\r\n}\r\n\r\ncontract Horse is Herbivore {\r\n\r\n    constructor(string memory name, uint age) HasName(name) HasAge(age) {\r\n    }\r\n\r\n    function speak() view public override returns(string memory) {\r\n        return \"neigh!\";\r\n    }\r\n}\r\n\r\ncontract Wolf is Carnivore {\r\n\r\n    constructor(string memory name, uint age) HasName(name) HasAge(age) {\r\n    }\r\n\r\n    function speak() view public override returns(string memory) {\r\n        return \"Awooo...\";\r\n    }\r\n}\r\n\r\ncontract Dog is Omnivore {\r\n    constructor(string memory name, uint age) HasName(name) HasAge(age){\r\n    }\r\n\r\n    function speak() view public override returns (string memory) {\r\n        return \"Woof\";\r\n    }\r\n }\r\n\r\n\r\ncontract Farmer {\r\n    //connect with address to particular animal to feed\r\n    function feed(address animal, string memory food) view public returns (string memory) {\r\n        return Animal(animal).eat(food);\r\n    }\r\n\r\n    function speak(address animal) view public returns (string memory) {\r\n        return Animal(animal).speak();\r\n    }\r\n}\r\n\r\n",
+  "sourcePath": "E:\\practice\\dz\\contracts\\AnimalsOOP.sol",
+  "ast": {
+    "absolutePath": "project:/contracts/AnimalsOOP.sol",
+    "exportedSymbols": {
+      "Animal": [
+        99
+      ],
+      "Carnivore": [
+        208
+      ],
+      "Cow": [
+        285
+      ],
+      "Dog": [
+        363
+      ],
+      "Farmer": [
+        395
+      ],
+      "HasAge": [
+        61
+      ],
+      "HasName": [
+        40
+      ],
+      "Herbivore": [
+        166
+      ],
+      "Horse": [
+        311
+      ],
+      "Living": [
+        19
+      ],
+      "Omnivore": [
+        259
+      ],
+      "StringComparer": [
+        124
+      ],
+      "Wolf": [
+        337
+      ]
+    },
+    "id": 396,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1,
+        "literals": [
+          "solidity",
+          "^",
+          "0.8",
+          ".17"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:24:0"
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "Living",
+        "contractDependencies": [],
+        "contractKind": "interface",
+        "fullyImplemented": false,
+        "id": 19,
+        "linearizedBaseContracts": [
+          19
+        ],
+        "name": "Living",
+        "nameLocation": "38:6:0",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "functionSelector": "728d9b74",
+            "id": 8,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "eat",
+            "nameLocation": "61:3:0",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 4,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 3,
+                  "mutability": "mutable",
+                  "name": "food",
+                  "nameLocation": "79:4:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8,
+                  "src": "65:18:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 2,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "65:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "64:20:0"
+            },
+            "returnParameters": {
+              "id": 7,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 6,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 8,
+                  "src": "103:13:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 5,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "103:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "102:15:0"
+            },
+            "scope": 19,
+            "src": "52:66:0",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "133a473e",
+            "id": 13,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "sleep",
+            "nameLocation": "133:5:0",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 9,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "138:2:0"
+            },
+            "returnParameters": {
+              "id": 12,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 11,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 13,
+                  "src": "159:13:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 10,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "159:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "158:15:0"
+            },
+            "scope": 19,
+            "src": "124:50:0",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          },
+          {
+            "functionSelector": "50d85315",
+            "id": 18,
+            "implemented": false,
+            "kind": "function",
+            "modifiers": [],
+            "name": "speak",
+            "nameLocation": "189:5:0",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 14,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "194:2:0"
+            },
+            "returnParameters": {
+              "id": 17,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 16,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 18,
+                  "src": "215:13:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 15,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "215:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "214:15:0"
+            },
+            "scope": 19,
+            "src": "180:50:0",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "external"
+          }
+        ],
+        "scope": 396,
+        "src": "28:205:0",
+        "usedErrors": []
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "HasName",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "fullyImplemented": true,
+        "id": 40,
+        "linearizedBaseContracts": [
+          40
+        ],
+        "name": "HasName",
+        "nameLocation": "246:7:0",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": false,
+            "id": 21,
+            "mutability": "mutable",
+            "name": "_name",
+            "nameLocation": "277:5:0",
+            "nodeType": "VariableDeclaration",
+            "scope": 40,
+            "src": "261:21:0",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_string_storage",
+              "typeString": "string"
+            },
+            "typeName": {
+              "id": 20,
+              "name": "string",
+              "nodeType": "ElementaryTypeName",
+              "src": "261:6:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_string_storage_ptr",
+                "typeString": "string"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 30,
+              "nodeType": "Block",
+              "src": "323:31:0",
+              "statements": [
+                {
+                  "expression": {
+                    "id": 28,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "id": 26,
+                      "name": "_name",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 21,
+                      "src": "334:5:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_string_storage",
+                        "typeString": "string storage ref"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "id": 27,
+                      "name": "name",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 23,
+                      "src": "342:4:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_string_memory_ptr",
+                        "typeString": "string memory"
+                      }
+                    },
+                    "src": "334:12:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage",
+                      "typeString": "string storage ref"
+                    }
+                  },
+                  "id": 29,
+                  "nodeType": "ExpressionStatement",
+                  "src": "334:12:0"
+                }
+              ]
+            },
+            "id": 31,
+            "implemented": true,
+            "kind": "constructor",
+            "modifiers": [],
+            "name": "",
+            "nameLocation": "-1:-1:-1",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 24,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 23,
+                  "mutability": "mutable",
+                  "name": "name",
+                  "nameLocation": "317:4:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 31,
+                  "src": "303:18:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 22,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "303:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "302:20:0"
+            },
+            "returnParameters": {
+              "id": 25,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "323:0:0"
+            },
+            "scope": 40,
+            "src": "291:63:0",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 38,
+              "nodeType": "Block",
+              "src": "416:31:0",
+              "statements": [
+                {
+                  "expression": {
+                    "id": 36,
+                    "name": "_name",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 21,
+                    "src": "434:5:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage",
+                      "typeString": "string storage ref"
+                    }
+                  },
+                  "functionReturnParameters": 35,
+                  "id": 37,
+                  "nodeType": "Return",
+                  "src": "427:12:0"
+                }
+              ]
+            },
+            "functionSelector": "17d7de7c",
+            "id": 39,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getName",
+            "nameLocation": "371:7:0",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 32,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "378:2:0"
+            },
+            "returnParameters": {
+              "id": 35,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 34,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 39,
+                  "src": "402:13:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 33,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "402:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "401:15:0"
+            },
+            "scope": 40,
+            "src": "362:85:0",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "public"
+          }
+        ],
+        "scope": 396,
+        "src": "237:213:0",
+        "usedErrors": []
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "HasAge",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "fullyImplemented": true,
+        "id": 61,
+        "linearizedBaseContracts": [
+          61
+        ],
+        "name": "HasAge",
+        "nameLocation": "463:6:0",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": false,
+            "id": 42,
+            "mutability": "mutable",
+            "name": "_age",
+            "nameLocation": "491:4:0",
+            "nodeType": "VariableDeclaration",
+            "scope": 61,
+            "src": "477:18:0",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_uint256",
+              "typeString": "uint256"
+            },
+            "typeName": {
+              "id": 41,
+              "name": "uint",
+              "nodeType": "ElementaryTypeName",
+              "src": "477:4:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_uint256",
+                "typeString": "uint256"
+              }
+            },
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 51,
+              "nodeType": "Block",
+              "src": "526:29:0",
+              "statements": [
+                {
+                  "expression": {
+                    "id": 49,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftHandSide": {
+                      "id": 47,
+                      "name": "_age",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 42,
+                      "src": "537:4:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "nodeType": "Assignment",
+                    "operator": "=",
+                    "rightHandSide": {
+                      "id": 48,
+                      "name": "age",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [],
+                      "referencedDeclaration": 44,
+                      "src": "544:3:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_uint256",
+                        "typeString": "uint256"
+                      }
+                    },
+                    "src": "537:10:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "id": 50,
+                  "nodeType": "ExpressionStatement",
+                  "src": "537:10:0"
+                }
+              ]
+            },
+            "id": 52,
+            "implemented": true,
+            "kind": "constructor",
+            "modifiers": [],
+            "name": "",
+            "nameLocation": "-1:-1:-1",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 45,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 44,
+                  "mutability": "mutable",
+                  "name": "age",
+                  "nameLocation": "521:3:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 52,
+                  "src": "516:8:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 43,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "516:4:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "515:10:0"
+            },
+            "returnParameters": {
+              "id": 46,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "526:0:0"
+            },
+            "scope": 61,
+            "src": "504:51:0",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 59,
+              "nodeType": "Block",
+              "src": "608:30:0",
+              "statements": [
+                {
+                  "expression": {
+                    "id": 57,
+                    "name": "_age",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 42,
+                    "src": "626:4:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "functionReturnParameters": 56,
+                  "id": 58,
+                  "nodeType": "Return",
+                  "src": "619:11:0"
+                }
+              ]
+            },
+            "functionSelector": "967e6e65",
+            "id": 60,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "getAge",
+            "nameLocation": "572:6:0",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 53,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "578:2:0"
+            },
+            "returnParameters": {
+              "id": 56,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 55,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 60,
+                  "src": "602:4:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 54,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "602:4:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "601:6:0"
+            },
+            "scope": 61,
+            "src": "563:75:0",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "public"
+          }
+        ],
+        "scope": 396,
+        "src": "454:187:0",
+        "usedErrors": []
+      },
+      {
+        "abstract": true,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 62,
+              "name": "Living",
+              "nameLocations": [
+                "673:6:0"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 19,
+              "src": "673:6:0"
+            },
+            "id": 63,
+            "nodeType": "InheritanceSpecifier",
+            "src": "673:6:0"
+          }
+        ],
+        "canonicalName": "Animal",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "fullyImplemented": true,
+        "id": 99,
+        "linearizedBaseContracts": [
+          99,
+          19
+        ],
+        "name": "Animal",
+        "nameLocation": "663:6:0",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "baseFunctions": [
+              8
+            ],
+            "body": {
+              "id": 81,
+              "nodeType": "Block",
+              "src": "766:75:0",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "arguments": [
+                          {
+                            "hexValue": "416e696d616c206561747320",
+                            "id": 76,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": true,
+                            "kind": "string",
+                            "lValueRequested": false,
+                            "nodeType": "Literal",
+                            "src": "812:14:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_stringliteral_cf14dd27f8b1b06baab06663f9730c5db6b167216d4ce30d4c234ddb0efc3547",
+                              "typeString": "literal_string \"Animal eats \""
+                            },
+                            "value": "Animal eats "
+                          },
+                          {
+                            "id": 77,
+                            "name": "food",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 65,
+                            "src": "827:4:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_string_memory_ptr",
+                              "typeString": "string memory"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_stringliteral_cf14dd27f8b1b06baab06663f9730c5db6b167216d4ce30d4c234ddb0efc3547",
+                              "typeString": "literal_string \"Animal eats \""
+                            },
+                            {
+                              "typeIdentifier": "t_string_memory_ptr",
+                              "typeString": "string memory"
+                            }
+                          ],
+                          "expression": {
+                            "id": 74,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": true,
+                            "lValueRequested": false,
+                            "nodeType": "ElementaryTypeNameExpression",
+                            "src": "798:6:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_type$_t_string_storage_ptr_$",
+                              "typeString": "type(string storage pointer)"
+                            },
+                            "typeName": {
+                              "id": 73,
+                              "name": "string",
+                              "nodeType": "ElementaryTypeName",
+                              "src": "798:6:0",
+                              "typeDescriptions": {}
+                            }
+                          },
+                          "id": 75,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "memberLocation": "805:6:0",
+                          "memberName": "concat",
+                          "nodeType": "MemberAccess",
+                          "src": "798:13:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_function_stringconcat_pure$__$returns$_t_string_memory_ptr_$",
+                            "typeString": "function () pure returns (string memory)"
+                          }
+                        },
+                        "id": 78,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "functionCall",
+                        "lValueRequested": false,
+                        "nameLocations": [],
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "798:34:0",
+                        "tryCall": false,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_string_memory_ptr",
+                          "typeString": "string memory"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_string_memory_ptr",
+                          "typeString": "string memory"
+                        }
+                      ],
+                      "expression": {
+                        "id": 71,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "lValueRequested": false,
+                        "nodeType": "ElementaryTypeNameExpression",
+                        "src": "784:6:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_type$_t_string_storage_ptr_$",
+                          "typeString": "type(string storage pointer)"
+                        },
+                        "typeName": {
+                          "id": 70,
+                          "name": "string",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "784:6:0",
+                          "typeDescriptions": {}
+                        }
+                      },
+                      "id": 72,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberLocation": "791:6:0",
+                      "memberName": "concat",
+                      "nodeType": "MemberAccess",
+                      "src": "784:13:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_stringconcat_pure$__$returns$_t_string_memory_ptr_$",
+                        "typeString": "function () pure returns (string memory)"
+                      }
+                    },
+                    "id": 79,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "784:49:0",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_memory_ptr",
+                      "typeString": "string memory"
+                    }
+                  },
+                  "functionReturnParameters": 69,
+                  "id": 80,
+                  "nodeType": "Return",
+                  "src": "777:56:0"
+                }
+              ]
+            },
+            "functionSelector": "728d9b74",
+            "id": 82,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "eat",
+            "nameLocation": "698:3:0",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 66,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 65,
+                  "mutability": "mutable",
+                  "name": "food",
+                  "nameLocation": "716:4:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 82,
+                  "src": "702:18:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 64,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "702:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "701:20:0"
+            },
+            "returnParameters": {
+              "id": 69,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 68,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 82,
+                  "src": "751:13:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 67,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "751:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "750:15:0"
+            },
+            "scope": 99,
+            "src": "689:152:0",
+            "stateMutability": "view",
+            "virtual": true,
+            "visibility": "public"
+          },
+          {
+            "baseFunctions": [
+              13
+            ],
+            "body": {
+              "id": 89,
+              "nodeType": "Block",
+              "src": "910:37:0",
+              "statements": [
+                {
+                  "expression": {
+                    "hexValue": "5a7a5a7a5a7a2e2e2e",
+                    "id": 87,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "kind": "string",
+                    "lValueRequested": false,
+                    "nodeType": "Literal",
+                    "src": "928:11:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_stringliteral_bdc60b63bf7bfdf829f9163f4719e9760e1fce41cd6908d6a860173ff2615e53",
+                      "typeString": "literal_string \"ZzZzZz...\""
+                    },
+                    "value": "ZzZzZz..."
+                  },
+                  "functionReturnParameters": 86,
+                  "id": 88,
+                  "nodeType": "Return",
+                  "src": "921:18:0"
+                }
+              ]
+            },
+            "functionSelector": "133a473e",
+            "id": 90,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "sleep",
+            "nameLocation": "858:5:0",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 83,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "863:2:0"
+            },
+            "returnParameters": {
+              "id": 86,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 85,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 90,
+                  "src": "895:13:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 84,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "895:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "894:15:0"
+            },
+            "scope": 99,
+            "src": "849:98:0",
+            "stateMutability": "view",
+            "virtual": true,
+            "visibility": "public"
+          },
+          {
+            "baseFunctions": [
+              18
+            ],
+            "body": {
+              "id": 97,
+              "nodeType": "Block",
+              "src": "1020:33:0",
+              "statements": [
+                {
+                  "expression": {
+                    "hexValue": "2e2e2e2e2e",
+                    "id": 95,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "kind": "string",
+                    "lValueRequested": false,
+                    "nodeType": "Literal",
+                    "src": "1038:7:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_stringliteral_512d397728e10e4e4dd0f8a5d696a0750b8e3fcabc5d33b742fc75cf664aade2",
+                      "typeString": "literal_string \".....\""
+                    },
+                    "value": "....."
+                  },
+                  "functionReturnParameters": 94,
+                  "id": 96,
+                  "nodeType": "Return",
+                  "src": "1031:14:0"
+                }
+              ]
+            },
+            "functionSelector": "50d85315",
+            "id": 98,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "speak",
+            "nameLocation": "968:5:0",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 91,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "973:2:0"
+            },
+            "returnParameters": {
+              "id": 94,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 93,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 98,
+                  "src": "1005:13:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 92,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1005:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1004:15:0"
+            },
+            "scope": 99,
+            "src": "959:94:0",
+            "stateMutability": "view",
+            "virtual": true,
+            "visibility": "public"
+          }
+        ],
+        "scope": 396,
+        "src": "645:411:0",
+        "usedErrors": []
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "StringComparer",
+        "contractDependencies": [],
+        "contractKind": "library",
+        "fullyImplemented": true,
+        "id": 124,
+        "linearizedBaseContracts": [
+          124
+        ],
+        "name": "StringComparer",
+        "nameLocation": "1068:14:0",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 122,
+              "nodeType": "Block",
+              "src": "1175:96:0",
+              "statements": [
+                {
+                  "expression": {
+                    "commonType": {
+                      "typeIdentifier": "t_bytes32",
+                      "typeString": "bytes32"
+                    },
+                    "id": 120,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "lValueRequested": false,
+                    "leftExpression": {
+                      "arguments": [
+                        {
+                          "arguments": [
+                            {
+                              "id": 111,
+                              "name": "str1",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 101,
+                              "src": "1220:4:0",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_string_memory_ptr",
+                                "typeString": "string memory"
+                              }
+                            }
+                          ],
+                          "expression": {
+                            "argumentTypes": [
+                              {
+                                "typeIdentifier": "t_string_memory_ptr",
+                                "typeString": "string memory"
+                              }
+                            ],
+                            "expression": {
+                              "id": 109,
+                              "name": "abi",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 4294967295,
+                              "src": "1203:3:0",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_magic_abi",
+                                "typeString": "abi"
+                              }
+                            },
+                            "id": 110,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": true,
+                            "lValueRequested": false,
+                            "memberLocation": "1207:12:0",
+                            "memberName": "encodePacked",
+                            "nodeType": "MemberAccess",
+                            "src": "1203:16:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_function_abiencodepacked_pure$__$returns$_t_bytes_memory_ptr_$",
+                              "typeString": "function () pure returns (bytes memory)"
+                            }
+                          },
+                          "id": 112,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "kind": "functionCall",
+                          "lValueRequested": false,
+                          "nameLocations": [],
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "1203:22:0",
+                          "tryCall": false,
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_bytes_memory_ptr",
+                            "typeString": "bytes memory"
+                          }
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_bytes_memory_ptr",
+                            "typeString": "bytes memory"
+                          }
+                        ],
+                        "id": 108,
+                        "name": "keccak256",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 4294967288,
+                        "src": "1193:9:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_function_keccak256_pure$_t_bytes_memory_ptr_$returns$_t_bytes32_$",
+                          "typeString": "function (bytes memory) pure returns (bytes32)"
+                        }
+                      },
+                      "id": 113,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "functionCall",
+                      "lValueRequested": false,
+                      "nameLocations": [],
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "1193:33:0",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "nodeType": "BinaryOperation",
+                    "operator": "==",
+                    "rightExpression": {
+                      "arguments": [
+                        {
+                          "arguments": [
+                            {
+                              "id": 117,
+                              "name": "str2",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 103,
+                              "src": "1257:4:0",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_string_memory_ptr",
+                                "typeString": "string memory"
+                              }
+                            }
+                          ],
+                          "expression": {
+                            "argumentTypes": [
+                              {
+                                "typeIdentifier": "t_string_memory_ptr",
+                                "typeString": "string memory"
+                              }
+                            ],
+                            "expression": {
+                              "id": 115,
+                              "name": "abi",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 4294967295,
+                              "src": "1240:3:0",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_magic_abi",
+                                "typeString": "abi"
+                              }
+                            },
+                            "id": 116,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": true,
+                            "lValueRequested": false,
+                            "memberLocation": "1244:12:0",
+                            "memberName": "encodePacked",
+                            "nodeType": "MemberAccess",
+                            "src": "1240:16:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_function_abiencodepacked_pure$__$returns$_t_bytes_memory_ptr_$",
+                              "typeString": "function () pure returns (bytes memory)"
+                            }
+                          },
+                          "id": 118,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "kind": "functionCall",
+                          "lValueRequested": false,
+                          "nameLocations": [],
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "1240:22:0",
+                          "tryCall": false,
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_bytes_memory_ptr",
+                            "typeString": "bytes memory"
+                          }
+                        }
+                      ],
+                      "expression": {
+                        "argumentTypes": [
+                          {
+                            "typeIdentifier": "t_bytes_memory_ptr",
+                            "typeString": "bytes memory"
+                          }
+                        ],
+                        "id": 114,
+                        "name": "keccak256",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 4294967288,
+                        "src": "1230:9:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_function_keccak256_pure$_t_bytes_memory_ptr_$returns$_t_bytes32_$",
+                          "typeString": "function (bytes memory) pure returns (bytes32)"
+                        }
+                      },
+                      "id": 119,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "kind": "functionCall",
+                      "lValueRequested": false,
+                      "nameLocations": [],
+                      "names": [],
+                      "nodeType": "FunctionCall",
+                      "src": "1230:33:0",
+                      "tryCall": false,
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_bytes32",
+                        "typeString": "bytes32"
+                      }
+                    },
+                    "src": "1193:70:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "functionReturnParameters": 107,
+                  "id": 121,
+                  "nodeType": "Return",
+                  "src": "1186:77:0"
+                }
+              ]
+            },
+            "functionSelector": "3a96fdd7",
+            "id": 123,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "compare",
+            "nameLocation": "1100:7:0",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 104,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 101,
+                  "mutability": "mutable",
+                  "name": "str1",
+                  "nameLocation": "1122:4:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 123,
+                  "src": "1108:18:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 100,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1108:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 103,
+                  "mutability": "mutable",
+                  "name": "str2",
+                  "nameLocation": "1142:4:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 123,
+                  "src": "1128:18:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 102,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1128:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1107:40:0"
+            },
+            "returnParameters": {
+              "id": 107,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 106,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 123,
+                  "src": "1169:4:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 105,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1169:4:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1168:6:0"
+            },
+            "scope": 124,
+            "src": "1091:180:0",
+            "stateMutability": "pure",
+            "virtual": false,
+            "visibility": "public"
+          }
+        ],
+        "scope": 396,
+        "src": "1060:220:0",
+        "usedErrors": []
+      },
+      {
+        "abstract": true,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 125,
+              "name": "Animal",
+              "nameLocations": [
+                "1315:6:0"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 99,
+              "src": "1315:6:0"
+            },
+            "id": 126,
+            "nodeType": "InheritanceSpecifier",
+            "src": "1315:6:0"
+          },
+          {
+            "baseName": {
+              "id": 127,
+              "name": "HasName",
+              "nameLocations": [
+                "1323:7:0"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 40,
+              "src": "1323:7:0"
+            },
+            "id": 128,
+            "nodeType": "InheritanceSpecifier",
+            "src": "1323:7:0"
+          },
+          {
+            "baseName": {
+              "id": 129,
+              "name": "HasAge",
+              "nameLocations": [
+                "1332:6:0"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 61,
+              "src": "1332:6:0"
+            },
+            "id": 130,
+            "nodeType": "InheritanceSpecifier",
+            "src": "1332:6:0"
+          }
+        ],
+        "canonicalName": "Herbivore",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "fullyImplemented": false,
+        "id": 166,
+        "linearizedBaseContracts": [
+          166,
+          61,
+          40,
+          99,
+          19
+        ],
+        "name": "Herbivore",
+        "nameLocation": "1302:9:0",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": true,
+            "id": 133,
+            "mutability": "constant",
+            "name": "PLANT",
+            "nameLocation": "1362:5:0",
+            "nodeType": "VariableDeclaration",
+            "scope": 166,
+            "src": "1346:31:0",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_string_memory_ptr",
+              "typeString": "string"
+            },
+            "typeName": {
+              "id": 131,
+              "name": "string",
+              "nodeType": "ElementaryTypeName",
+              "src": "1346:6:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_string_storage_ptr",
+                "typeString": "string"
+              }
+            },
+            "value": {
+              "hexValue": "706c616e74",
+              "id": 132,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "string",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "1370:7:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_stringliteral_7d4c9dee5ae2ff08a48347c99fba962b592bd6ab8dc8f2b4d458d640978e6c0f",
+                "typeString": "literal_string \"plant\""
+              },
+              "value": "plant"
+            },
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 147,
+              "nodeType": "Block",
+              "src": "1428:106:0",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "arguments": [
+                          {
+                            "id": 140,
+                            "name": "food",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 135,
+                            "src": "1470:4:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_string_memory_ptr",
+                              "typeString": "string memory"
+                            }
+                          },
+                          {
+                            "id": 141,
+                            "name": "PLANT",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 133,
+                            "src": "1476:5:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_string_memory_ptr",
+                              "typeString": "string memory"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_string_memory_ptr",
+                              "typeString": "string memory"
+                            },
+                            {
+                              "typeIdentifier": "t_string_memory_ptr",
+                              "typeString": "string memory"
+                            }
+                          ],
+                          "expression": {
+                            "id": 138,
+                            "name": "StringComparer",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 124,
+                            "src": "1447:14:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_type$_t_contract$_StringComparer_$124_$",
+                              "typeString": "type(library StringComparer)"
+                            }
+                          },
+                          "id": 139,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "memberLocation": "1462:7:0",
+                          "memberName": "compare",
+                          "nodeType": "MemberAccess",
+                          "referencedDeclaration": 123,
+                          "src": "1447:22:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_function_delegatecall_pure$_t_string_memory_ptr_$_t_string_memory_ptr_$returns$_t_bool_$",
+                            "typeString": "function (string memory,string memory) pure returns (bool)"
+                          }
+                        },
+                        "id": 142,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "functionCall",
+                        "lValueRequested": false,
+                        "nameLocations": [],
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "1447:35:0",
+                        "tryCall": false,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "hexValue": "4865726269766f72657320656174206f6e6c7920706c616e74732e",
+                        "id": 143,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "1484:29:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_9363b4a32a3212162a2eca6fde992cec59db2541370aca13fc1a310adb070eb1",
+                          "typeString": "literal_string \"Herbivores eat only plants.\""
+                        },
+                        "value": "Herbivores eat only plants."
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_9363b4a32a3212162a2eca6fde992cec59db2541370aca13fc1a310adb070eb1",
+                          "typeString": "literal_string \"Herbivores eat only plants.\""
+                        }
+                      ],
+                      "id": 137,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        4294967278,
+                        4294967278
+                      ],
+                      "referencedDeclaration": 4294967278,
+                      "src": "1439:7:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 144,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1439:75:0",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 145,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1439:75:0"
+                },
+                {
+                  "id": 146,
+                  "nodeType": "PlaceholderStatement",
+                  "src": "1525:1:0"
+                }
+              ]
+            },
+            "id": 148,
+            "name": "eatOnlyPlant",
+            "nameLocation": "1395:12:0",
+            "nodeType": "ModifierDefinition",
+            "parameters": {
+              "id": 136,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 135,
+                  "mutability": "mutable",
+                  "name": "food",
+                  "nameLocation": "1422:4:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 148,
+                  "src": "1408:18:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 134,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1408:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1407:20:0"
+            },
+            "src": "1386:148:0",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "baseFunctions": [
+              82
+            ],
+            "body": {
+              "id": 164,
+              "nodeType": "Block",
+              "src": "1647:41:0",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "id": 161,
+                        "name": "food",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 150,
+                        "src": "1675:4:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_string_memory_ptr",
+                          "typeString": "string memory"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_string_memory_ptr",
+                          "typeString": "string memory"
+                        }
+                      ],
+                      "expression": {
+                        "id": 159,
+                        "name": "super",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 4294967271,
+                        "src": "1665:5:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_type$_t_super$_Herbivore_$166_$",
+                          "typeString": "type(contract super Herbivore)"
+                        }
+                      },
+                      "id": 160,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberLocation": "1671:3:0",
+                      "memberName": "eat",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 82,
+                      "src": "1665:9:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_view$_t_string_memory_ptr_$returns$_t_string_memory_ptr_$",
+                        "typeString": "function (string memory) view returns (string memory)"
+                      }
+                    },
+                    "id": 162,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1665:15:0",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_memory_ptr",
+                      "typeString": "string memory"
+                    }
+                  },
+                  "functionReturnParameters": 158,
+                  "id": 163,
+                  "nodeType": "Return",
+                  "src": "1658:22:0"
+                }
+              ]
+            },
+            "functionSelector": "728d9b74",
+            "id": 165,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "arguments": [
+                  {
+                    "id": 154,
+                    "name": "food",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 150,
+                    "src": "1617:4:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_memory_ptr",
+                      "typeString": "string memory"
+                    }
+                  }
+                ],
+                "id": 155,
+                "kind": "modifierInvocation",
+                "modifierName": {
+                  "id": 153,
+                  "name": "eatOnlyPlant",
+                  "nameLocations": [
+                    "1604:12:0"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 148,
+                  "src": "1604:12:0"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "1604:18:0"
+              }
+            ],
+            "name": "eat",
+            "nameLocation": "1551:3:0",
+            "nodeType": "FunctionDefinition",
+            "overrides": {
+              "id": 152,
+              "nodeType": "OverrideSpecifier",
+              "overrides": [],
+              "src": "1588:8:0"
+            },
+            "parameters": {
+              "id": 151,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 150,
+                  "mutability": "mutable",
+                  "name": "food",
+                  "nameLocation": "1569:4:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 165,
+                  "src": "1555:18:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 149,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1555:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1554:20:0"
+            },
+            "returnParameters": {
+              "id": 158,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 157,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 165,
+                  "src": "1632:13:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 156,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1632:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1631:15:0"
+            },
+            "scope": 166,
+            "src": "1542:146:0",
+            "stateMutability": "view",
+            "virtual": true,
+            "visibility": "public"
+          }
+        ],
+        "scope": 396,
+        "src": "1284:407:0",
+        "usedErrors": []
+      },
+      {
+        "abstract": true,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 167,
+              "name": "Animal",
+              "nameLocations": [
+                "1726:6:0"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 99,
+              "src": "1726:6:0"
+            },
+            "id": 168,
+            "nodeType": "InheritanceSpecifier",
+            "src": "1726:6:0"
+          },
+          {
+            "baseName": {
+              "id": 169,
+              "name": "HasName",
+              "nameLocations": [
+                "1734:7:0"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 40,
+              "src": "1734:7:0"
+            },
+            "id": 170,
+            "nodeType": "InheritanceSpecifier",
+            "src": "1734:7:0"
+          },
+          {
+            "baseName": {
+              "id": 171,
+              "name": "HasAge",
+              "nameLocations": [
+                "1743:6:0"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 61,
+              "src": "1743:6:0"
+            },
+            "id": 172,
+            "nodeType": "InheritanceSpecifier",
+            "src": "1743:6:0"
+          }
+        ],
+        "canonicalName": "Carnivore",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "fullyImplemented": false,
+        "id": 208,
+        "linearizedBaseContracts": [
+          208,
+          61,
+          40,
+          99,
+          19
+        ],
+        "name": "Carnivore",
+        "nameLocation": "1713:9:0",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": true,
+            "id": 175,
+            "mutability": "constant",
+            "name": "MEAT",
+            "nameLocation": "1773:4:0",
+            "nodeType": "VariableDeclaration",
+            "scope": 208,
+            "src": "1757:29:0",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_string_memory_ptr",
+              "typeString": "string"
+            },
+            "typeName": {
+              "id": 173,
+              "name": "string",
+              "nodeType": "ElementaryTypeName",
+              "src": "1757:6:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_string_storage_ptr",
+                "typeString": "string"
+              }
+            },
+            "value": {
+              "hexValue": "6d656174",
+              "id": 174,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "string",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "1780:6:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_stringliteral_b967753c19613e062485b5d3e4b4b3e7a74793da103cd3a3e40324e42da4c2b6",
+                "typeString": "literal_string \"meat\""
+              },
+              "value": "meat"
+            },
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 189,
+              "nodeType": "Block",
+              "src": "1836:103:0",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "arguments": [
+                          {
+                            "id": 182,
+                            "name": "food",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 177,
+                            "src": "1878:4:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_string_memory_ptr",
+                              "typeString": "string memory"
+                            }
+                          },
+                          {
+                            "id": 183,
+                            "name": "MEAT",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 175,
+                            "src": "1884:4:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_string_memory_ptr",
+                              "typeString": "string memory"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_string_memory_ptr",
+                              "typeString": "string memory"
+                            },
+                            {
+                              "typeIdentifier": "t_string_memory_ptr",
+                              "typeString": "string memory"
+                            }
+                          ],
+                          "expression": {
+                            "id": 180,
+                            "name": "StringComparer",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 124,
+                            "src": "1855:14:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_type$_t_contract$_StringComparer_$124_$",
+                              "typeString": "type(library StringComparer)"
+                            }
+                          },
+                          "id": 181,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "memberLocation": "1870:7:0",
+                          "memberName": "compare",
+                          "nodeType": "MemberAccess",
+                          "referencedDeclaration": 123,
+                          "src": "1855:22:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_function_delegatecall_pure$_t_string_memory_ptr_$_t_string_memory_ptr_$returns$_t_bool_$",
+                            "typeString": "function (string memory,string memory) pure returns (bool)"
+                          }
+                        },
+                        "id": 184,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "functionCall",
+                        "lValueRequested": false,
+                        "nameLocations": [],
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "1855:34:0",
+                        "tryCall": false,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "hexValue": "4361726e69766f72657320656174206f6e6c79206d6561742e",
+                        "id": 185,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "1891:27:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_b5a812a0e5e87f343e94ac1da709ac4fd22fdeec6a37660e563d128863672386",
+                          "typeString": "literal_string \"Carnivores eat only meat.\""
+                        },
+                        "value": "Carnivores eat only meat."
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_b5a812a0e5e87f343e94ac1da709ac4fd22fdeec6a37660e563d128863672386",
+                          "typeString": "literal_string \"Carnivores eat only meat.\""
+                        }
+                      ],
+                      "id": 179,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        4294967278,
+                        4294967278
+                      ],
+                      "referencedDeclaration": 4294967278,
+                      "src": "1847:7:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 186,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "1847:72:0",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 187,
+                  "nodeType": "ExpressionStatement",
+                  "src": "1847:72:0"
+                },
+                {
+                  "id": 188,
+                  "nodeType": "PlaceholderStatement",
+                  "src": "1930:1:0"
+                }
+              ]
+            },
+            "id": 190,
+            "name": "eatOnlyMeat",
+            "nameLocation": "1804:11:0",
+            "nodeType": "ModifierDefinition",
+            "parameters": {
+              "id": 178,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 177,
+                  "mutability": "mutable",
+                  "name": "food",
+                  "nameLocation": "1830:4:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 190,
+                  "src": "1816:18:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 176,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1816:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1815:20:0"
+            },
+            "src": "1795:144:0",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "baseFunctions": [
+              82
+            ],
+            "body": {
+              "id": 206,
+              "nodeType": "Block",
+              "src": "2055:41:0",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "id": 203,
+                        "name": "food",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 192,
+                        "src": "2083:4:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_string_memory_ptr",
+                          "typeString": "string memory"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_string_memory_ptr",
+                          "typeString": "string memory"
+                        }
+                      ],
+                      "expression": {
+                        "id": 201,
+                        "name": "super",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 4294967271,
+                        "src": "2073:5:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_type$_t_super$_Carnivore_$208_$",
+                          "typeString": "type(contract super Carnivore)"
+                        }
+                      },
+                      "id": 202,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberLocation": "2079:3:0",
+                      "memberName": "eat",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 82,
+                      "src": "2073:9:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_view$_t_string_memory_ptr_$returns$_t_string_memory_ptr_$",
+                        "typeString": "function (string memory) view returns (string memory)"
+                      }
+                    },
+                    "id": 204,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "2073:15:0",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_memory_ptr",
+                      "typeString": "string memory"
+                    }
+                  },
+                  "functionReturnParameters": 200,
+                  "id": 205,
+                  "nodeType": "Return",
+                  "src": "2066:22:0"
+                }
+              ]
+            },
+            "functionSelector": "728d9b74",
+            "id": 207,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "arguments": [
+                  {
+                    "id": 196,
+                    "name": "food",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 192,
+                    "src": "2025:4:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_memory_ptr",
+                      "typeString": "string memory"
+                    }
+                  }
+                ],
+                "id": 197,
+                "kind": "modifierInvocation",
+                "modifierName": {
+                  "id": 195,
+                  "name": "eatOnlyMeat",
+                  "nameLocations": [
+                    "2013:11:0"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 190,
+                  "src": "2013:11:0"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "2013:17:0"
+              }
+            ],
+            "name": "eat",
+            "nameLocation": "1960:3:0",
+            "nodeType": "FunctionDefinition",
+            "overrides": {
+              "id": 194,
+              "nodeType": "OverrideSpecifier",
+              "overrides": [],
+              "src": "2004:8:0"
+            },
+            "parameters": {
+              "id": 193,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 192,
+                  "mutability": "mutable",
+                  "name": "food",
+                  "nameLocation": "1978:4:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 207,
+                  "src": "1964:18:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 191,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "1964:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "1963:20:0"
+            },
+            "returnParameters": {
+              "id": 200,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 199,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 207,
+                  "src": "2040:13:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 198,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2040:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2039:15:0"
+            },
+            "scope": 208,
+            "src": "1951:145:0",
+            "stateMutability": "view",
+            "virtual": true,
+            "visibility": "public"
+          }
+        ],
+        "scope": 396,
+        "src": "1695:404:0",
+        "usedErrors": []
+      },
+      {
+        "abstract": true,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 209,
+              "name": "Animal",
+              "nameLocations": [
+                "2134:6:0"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 99,
+              "src": "2134:6:0"
+            },
+            "id": 210,
+            "nodeType": "InheritanceSpecifier",
+            "src": "2134:6:0"
+          },
+          {
+            "baseName": {
+              "id": 211,
+              "name": "HasName",
+              "nameLocations": [
+                "2142:7:0"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 40,
+              "src": "2142:7:0"
+            },
+            "id": 212,
+            "nodeType": "InheritanceSpecifier",
+            "src": "2142:7:0"
+          },
+          {
+            "baseName": {
+              "id": 213,
+              "name": "HasAge",
+              "nameLocations": [
+                "2151:6:0"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 61,
+              "src": "2151:6:0"
+            },
+            "id": 214,
+            "nodeType": "InheritanceSpecifier",
+            "src": "2151:6:0"
+          }
+        ],
+        "canonicalName": "Omnivore",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "fullyImplemented": false,
+        "id": 259,
+        "linearizedBaseContracts": [
+          259,
+          61,
+          40,
+          99,
+          19
+        ],
+        "name": "Omnivore",
+        "nameLocation": "2122:8:0",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "constant": true,
+            "id": 217,
+            "mutability": "constant",
+            "name": "MEAT",
+            "nameLocation": "2180:4:0",
+            "nodeType": "VariableDeclaration",
+            "scope": 259,
+            "src": "2164:29:0",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_string_memory_ptr",
+              "typeString": "string"
+            },
+            "typeName": {
+              "id": 215,
+              "name": "string",
+              "nodeType": "ElementaryTypeName",
+              "src": "2164:6:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_string_storage_ptr",
+                "typeString": "string"
+              }
+            },
+            "value": {
+              "hexValue": "6d656174",
+              "id": 216,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "string",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "2187:6:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_stringliteral_b967753c19613e062485b5d3e4b4b3e7a74793da103cd3a3e40324e42da4c2b6",
+                "typeString": "literal_string \"meat\""
+              },
+              "value": "meat"
+            },
+            "visibility": "internal"
+          },
+          {
+            "constant": true,
+            "id": 220,
+            "mutability": "constant",
+            "name": "PLANT",
+            "nameLocation": "2216:5:0",
+            "nodeType": "VariableDeclaration",
+            "scope": 259,
+            "src": "2200:31:0",
+            "stateVariable": true,
+            "storageLocation": "default",
+            "typeDescriptions": {
+              "typeIdentifier": "t_string_memory_ptr",
+              "typeString": "string"
+            },
+            "typeName": {
+              "id": 218,
+              "name": "string",
+              "nodeType": "ElementaryTypeName",
+              "src": "2200:6:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_string_storage_ptr",
+                "typeString": "string"
+              }
+            },
+            "value": {
+              "hexValue": "706c616e74",
+              "id": 219,
+              "isConstant": false,
+              "isLValue": false,
+              "isPure": true,
+              "kind": "string",
+              "lValueRequested": false,
+              "nodeType": "Literal",
+              "src": "2224:7:0",
+              "typeDescriptions": {
+                "typeIdentifier": "t_stringliteral_7d4c9dee5ae2ff08a48347c99fba962b592bd6ab8dc8f2b4d458d640978e6c0f",
+                "typeString": "literal_string \"plant\""
+              },
+              "value": "plant"
+            },
+            "visibility": "internal"
+          },
+          {
+            "body": {
+              "id": 240,
+              "nodeType": "Block",
+              "src": "2277:144:0",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "commonType": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        "id": 235,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "arguments": [
+                            {
+                              "id": 227,
+                              "name": "food",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 222,
+                              "src": "2319:4:0",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_string_memory_ptr",
+                                "typeString": "string memory"
+                              }
+                            },
+                            {
+                              "id": 228,
+                              "name": "MEAT",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 217,
+                              "src": "2325:4:0",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_string_memory_ptr",
+                                "typeString": "string memory"
+                              }
+                            }
+                          ],
+                          "expression": {
+                            "argumentTypes": [
+                              {
+                                "typeIdentifier": "t_string_memory_ptr",
+                                "typeString": "string memory"
+                              },
+                              {
+                                "typeIdentifier": "t_string_memory_ptr",
+                                "typeString": "string memory"
+                              }
+                            ],
+                            "expression": {
+                              "id": 225,
+                              "name": "StringComparer",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 124,
+                              "src": "2296:14:0",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_type$_t_contract$_StringComparer_$124_$",
+                                "typeString": "type(library StringComparer)"
+                              }
+                            },
+                            "id": 226,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "memberLocation": "2311:7:0",
+                            "memberName": "compare",
+                            "nodeType": "MemberAccess",
+                            "referencedDeclaration": 123,
+                            "src": "2296:22:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_function_delegatecall_pure$_t_string_memory_ptr_$_t_string_memory_ptr_$returns$_t_bool_$",
+                              "typeString": "function (string memory,string memory) pure returns (bool)"
+                            }
+                          },
+                          "id": 229,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "kind": "functionCall",
+                          "lValueRequested": false,
+                          "nameLocations": [],
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "2296:34:0",
+                          "tryCall": false,
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_bool",
+                            "typeString": "bool"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": "||",
+                        "rightExpression": {
+                          "arguments": [
+                            {
+                              "id": 232,
+                              "name": "food",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 222,
+                              "src": "2357:4:0",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_string_memory_ptr",
+                                "typeString": "string memory"
+                              }
+                            },
+                            {
+                              "id": 233,
+                              "name": "PLANT",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 220,
+                              "src": "2363:5:0",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_string_memory_ptr",
+                                "typeString": "string memory"
+                              }
+                            }
+                          ],
+                          "expression": {
+                            "argumentTypes": [
+                              {
+                                "typeIdentifier": "t_string_memory_ptr",
+                                "typeString": "string memory"
+                              },
+                              {
+                                "typeIdentifier": "t_string_memory_ptr",
+                                "typeString": "string memory"
+                              }
+                            ],
+                            "expression": {
+                              "id": 230,
+                              "name": "StringComparer",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 124,
+                              "src": "2334:14:0",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_type$_t_contract$_StringComparer_$124_$",
+                                "typeString": "type(library StringComparer)"
+                              }
+                            },
+                            "id": 231,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "memberLocation": "2349:7:0",
+                            "memberName": "compare",
+                            "nodeType": "MemberAccess",
+                            "referencedDeclaration": 123,
+                            "src": "2334:22:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_function_delegatecall_pure$_t_string_memory_ptr_$_t_string_memory_ptr_$returns$_t_bool_$",
+                              "typeString": "function (string memory,string memory) pure returns (bool)"
+                            }
+                          },
+                          "id": 234,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "kind": "functionCall",
+                          "lValueRequested": false,
+                          "nameLocations": [],
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "2334:35:0",
+                          "tryCall": false,
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_bool",
+                            "typeString": "bool"
+                          }
+                        },
+                        "src": "2296:73:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      },
+                      {
+                        "hexValue": "4f6d6e69766f7265732065617420706c616e74206f72206d656174",
+                        "id": 236,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": true,
+                        "kind": "string",
+                        "lValueRequested": false,
+                        "nodeType": "Literal",
+                        "src": "2371:29:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_stringliteral_e9223b192346ea60b41623982c8c7152fec4e8f8a210c8bb738263940cbc5379",
+                          "typeString": "literal_string \"Omnivores eat plant or meat\""
+                        },
+                        "value": "Omnivores eat plant or meat"
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        },
+                        {
+                          "typeIdentifier": "t_stringliteral_e9223b192346ea60b41623982c8c7152fec4e8f8a210c8bb738263940cbc5379",
+                          "typeString": "literal_string \"Omnivores eat plant or meat\""
+                        }
+                      ],
+                      "id": 224,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        4294967278,
+                        4294967278
+                      ],
+                      "referencedDeclaration": 4294967278,
+                      "src": "2288:7:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                        "typeString": "function (bool,string memory) pure"
+                      }
+                    },
+                    "id": 237,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "2288:113:0",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 238,
+                  "nodeType": "ExpressionStatement",
+                  "src": "2288:113:0"
+                },
+                {
+                  "id": 239,
+                  "nodeType": "PlaceholderStatement",
+                  "src": "2412:1:0"
+                }
+              ]
+            },
+            "id": 241,
+            "name": "eatBoth",
+            "nameLocation": "2249:7:0",
+            "nodeType": "ModifierDefinition",
+            "parameters": {
+              "id": 223,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 222,
+                  "mutability": "mutable",
+                  "name": "food",
+                  "nameLocation": "2271:4:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 241,
+                  "src": "2257:18:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 221,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2257:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2256:20:0"
+            },
+            "src": "2240:181:0",
+            "virtual": false,
+            "visibility": "internal"
+          },
+          {
+            "baseFunctions": [
+              82
+            ],
+            "body": {
+              "id": 257,
+              "nodeType": "Block",
+              "src": "2529:41:0",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "id": 254,
+                        "name": "food",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 243,
+                        "src": "2557:4:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_string_memory_ptr",
+                          "typeString": "string memory"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_string_memory_ptr",
+                          "typeString": "string memory"
+                        }
+                      ],
+                      "expression": {
+                        "id": 252,
+                        "name": "super",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 4294967271,
+                        "src": "2547:5:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_type$_t_super$_Omnivore_$259_$",
+                          "typeString": "type(contract super Omnivore)"
+                        }
+                      },
+                      "id": 253,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberLocation": "2553:3:0",
+                      "memberName": "eat",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 82,
+                      "src": "2547:9:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_internal_view$_t_string_memory_ptr_$returns$_t_string_memory_ptr_$",
+                        "typeString": "function (string memory) view returns (string memory)"
+                      }
+                    },
+                    "id": 255,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "2547:15:0",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_memory_ptr",
+                      "typeString": "string memory"
+                    }
+                  },
+                  "functionReturnParameters": 251,
+                  "id": 256,
+                  "nodeType": "Return",
+                  "src": "2540:22:0"
+                }
+              ]
+            },
+            "functionSelector": "728d9b74",
+            "id": 258,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [
+              {
+                "arguments": [
+                  {
+                    "id": 247,
+                    "name": "food",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 243,
+                    "src": "2499:4:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_memory_ptr",
+                      "typeString": "string memory"
+                    }
+                  }
+                ],
+                "id": 248,
+                "kind": "modifierInvocation",
+                "modifierName": {
+                  "id": 246,
+                  "name": "eatBoth",
+                  "nameLocations": [
+                    "2491:7:0"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 241,
+                  "src": "2491:7:0"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "2491:13:0"
+              }
+            ],
+            "name": "eat",
+            "nameLocation": "2438:3:0",
+            "nodeType": "FunctionDefinition",
+            "overrides": {
+              "id": 245,
+              "nodeType": "OverrideSpecifier",
+              "overrides": [],
+              "src": "2482:8:0"
+            },
+            "parameters": {
+              "id": 244,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 243,
+                  "mutability": "mutable",
+                  "name": "food",
+                  "nameLocation": "2456:4:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 258,
+                  "src": "2442:18:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 242,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2442:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2441:20:0"
+            },
+            "returnParameters": {
+              "id": 251,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 250,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 258,
+                  "src": "2514:13:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 249,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2514:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2513:15:0"
+            },
+            "scope": 259,
+            "src": "2429:141:0",
+            "stateMutability": "view",
+            "virtual": true,
+            "visibility": "public"
+          }
+        ],
+        "scope": 396,
+        "src": "2103:470:0",
+        "usedErrors": []
+      },
+      {
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 260,
+              "name": "Herbivore",
+              "nameLocations": [
+                "2597:9:0"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 166,
+              "src": "2597:9:0"
+            },
+            "id": 261,
+            "nodeType": "InheritanceSpecifier",
+            "src": "2597:9:0"
+          }
+        ],
+        "canonicalName": "Cow",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "fullyImplemented": true,
+        "id": 285,
+        "linearizedBaseContracts": [
+          285,
+          166,
+          61,
+          40,
+          99,
+          19
+        ],
+        "name": "Cow",
+        "nameLocation": "2590:3:0",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 274,
+              "nodeType": "Block",
+              "src": "2683:8:0",
+              "statements": []
+            },
+            "id": 275,
+            "implemented": true,
+            "kind": "constructor",
+            "modifiers": [
+              {
+                "arguments": [
+                  {
+                    "id": 268,
+                    "name": "name",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 263,
+                    "src": "2666:4:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_memory_ptr",
+                      "typeString": "string memory"
+                    }
+                  }
+                ],
+                "id": 269,
+                "kind": "baseConstructorSpecifier",
+                "modifierName": {
+                  "id": 267,
+                  "name": "HasName",
+                  "nameLocations": [
+                    "2658:7:0"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 40,
+                  "src": "2658:7:0"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "2658:13:0"
+              },
+              {
+                "arguments": [
+                  {
+                    "id": 271,
+                    "name": "age",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 265,
+                    "src": "2679:3:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  }
+                ],
+                "id": 272,
+                "kind": "baseConstructorSpecifier",
+                "modifierName": {
+                  "id": 270,
+                  "name": "HasAge",
+                  "nameLocations": [
+                    "2672:6:0"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 61,
+                  "src": "2672:6:0"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "2672:11:0"
+              }
+            ],
+            "name": "",
+            "nameLocation": "-1:-1:-1",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 266,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 263,
+                  "mutability": "mutable",
+                  "name": "name",
+                  "nameLocation": "2642:4:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 275,
+                  "src": "2628:18:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 262,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2628:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 265,
+                  "mutability": "mutable",
+                  "name": "age",
+                  "nameLocation": "2653:3:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 275,
+                  "src": "2648:8:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 264,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2648:4:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2627:30:0"
+            },
+            "returnParameters": {
+              "id": 273,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2683:0:0"
+            },
+            "scope": 285,
+            "src": "2616:75:0",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "public"
+          },
+          {
+            "baseFunctions": [
+              98
+            ],
+            "body": {
+              "id": 283,
+              "nodeType": "Block",
+              "src": "2761:36:0",
+              "statements": [
+                {
+                  "expression": {
+                    "hexValue": "4d6f6f6f6f2e2e2e",
+                    "id": 281,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "kind": "string",
+                    "lValueRequested": false,
+                    "nodeType": "Literal",
+                    "src": "2779:10:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_stringliteral_c5168a49a1b9d0859cdebdca195c0c7247e1ead1d74e315564ba1c785df7c810",
+                      "typeString": "literal_string \"Moooo...\""
+                    },
+                    "value": "Moooo..."
+                  },
+                  "functionReturnParameters": 280,
+                  "id": 282,
+                  "nodeType": "Return",
+                  "src": "2772:17:0"
+                }
+              ]
+            },
+            "functionSelector": "50d85315",
+            "id": 284,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "speak",
+            "nameLocation": "2708:5:0",
+            "nodeType": "FunctionDefinition",
+            "overrides": {
+              "id": 277,
+              "nodeType": "OverrideSpecifier",
+              "overrides": [],
+              "src": "2728:8:0"
+            },
+            "parameters": {
+              "id": 276,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2713:2:0"
+            },
+            "returnParameters": {
+              "id": 280,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 279,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 284,
+                  "src": "2746:13:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 278,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2746:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2745:15:0"
+            },
+            "scope": 285,
+            "src": "2699:98:0",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "public"
+          }
+        ],
+        "scope": 396,
+        "src": "2581:219:0",
+        "usedErrors": []
+      },
+      {
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 286,
+              "name": "Herbivore",
+              "nameLocations": [
+                "2822:9:0"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 166,
+              "src": "2822:9:0"
+            },
+            "id": 287,
+            "nodeType": "InheritanceSpecifier",
+            "src": "2822:9:0"
+          }
+        ],
+        "canonicalName": "Horse",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "fullyImplemented": true,
+        "id": 311,
+        "linearizedBaseContracts": [
+          311,
+          166,
+          61,
+          40,
+          99,
+          19
+        ],
+        "name": "Horse",
+        "nameLocation": "2813:5:0",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 300,
+              "nodeType": "Block",
+              "src": "2909:8:0",
+              "statements": []
+            },
+            "id": 301,
+            "implemented": true,
+            "kind": "constructor",
+            "modifiers": [
+              {
+                "arguments": [
+                  {
+                    "id": 294,
+                    "name": "name",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 289,
+                    "src": "2891:4:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_memory_ptr",
+                      "typeString": "string memory"
+                    }
+                  }
+                ],
+                "id": 295,
+                "kind": "baseConstructorSpecifier",
+                "modifierName": {
+                  "id": 293,
+                  "name": "HasName",
+                  "nameLocations": [
+                    "2883:7:0"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 40,
+                  "src": "2883:7:0"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "2883:13:0"
+              },
+              {
+                "arguments": [
+                  {
+                    "id": 297,
+                    "name": "age",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 291,
+                    "src": "2904:3:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  }
+                ],
+                "id": 298,
+                "kind": "baseConstructorSpecifier",
+                "modifierName": {
+                  "id": 296,
+                  "name": "HasAge",
+                  "nameLocations": [
+                    "2897:6:0"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 61,
+                  "src": "2897:6:0"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "2897:11:0"
+              }
+            ],
+            "name": "",
+            "nameLocation": "-1:-1:-1",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 292,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 289,
+                  "mutability": "mutable",
+                  "name": "name",
+                  "nameLocation": "2867:4:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 301,
+                  "src": "2853:18:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 288,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2853:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 291,
+                  "mutability": "mutable",
+                  "name": "age",
+                  "nameLocation": "2878:3:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 301,
+                  "src": "2873:8:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 290,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2873:4:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2852:30:0"
+            },
+            "returnParameters": {
+              "id": 299,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2909:0:0"
+            },
+            "scope": 311,
+            "src": "2841:76:0",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "public"
+          },
+          {
+            "baseFunctions": [
+              98
+            ],
+            "body": {
+              "id": 309,
+              "nodeType": "Block",
+              "src": "2986:34:0",
+              "statements": [
+                {
+                  "expression": {
+                    "hexValue": "6e6569676821",
+                    "id": 307,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "kind": "string",
+                    "lValueRequested": false,
+                    "nodeType": "Literal",
+                    "src": "3004:8:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_stringliteral_69ce7fccdc6059ce95d9e8866b36ee87c398f9bf41611bb7c1416a0cc3969009",
+                      "typeString": "literal_string \"neigh!\""
+                    },
+                    "value": "neigh!"
+                  },
+                  "functionReturnParameters": 306,
+                  "id": 308,
+                  "nodeType": "Return",
+                  "src": "2997:15:0"
+                }
+              ]
+            },
+            "functionSelector": "50d85315",
+            "id": 310,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "speak",
+            "nameLocation": "2934:5:0",
+            "nodeType": "FunctionDefinition",
+            "overrides": {
+              "id": 303,
+              "nodeType": "OverrideSpecifier",
+              "overrides": [],
+              "src": "2954:8:0"
+            },
+            "parameters": {
+              "id": 302,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "2939:2:0"
+            },
+            "returnParameters": {
+              "id": 306,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 305,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 310,
+                  "src": "2971:13:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 304,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "2971:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "2970:15:0"
+            },
+            "scope": 311,
+            "src": "2925:95:0",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "public"
+          }
+        ],
+        "scope": 396,
+        "src": "2804:219:0",
+        "usedErrors": []
+      },
+      {
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 312,
+              "name": "Carnivore",
+              "nameLocations": [
+                "3044:9:0"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 208,
+              "src": "3044:9:0"
+            },
+            "id": 313,
+            "nodeType": "InheritanceSpecifier",
+            "src": "3044:9:0"
+          }
+        ],
+        "canonicalName": "Wolf",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "fullyImplemented": true,
+        "id": 337,
+        "linearizedBaseContracts": [
+          337,
+          208,
+          61,
+          40,
+          99,
+          19
+        ],
+        "name": "Wolf",
+        "nameLocation": "3036:4:0",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 326,
+              "nodeType": "Block",
+              "src": "3131:8:0",
+              "statements": []
+            },
+            "id": 327,
+            "implemented": true,
+            "kind": "constructor",
+            "modifiers": [
+              {
+                "arguments": [
+                  {
+                    "id": 320,
+                    "name": "name",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 315,
+                    "src": "3113:4:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_memory_ptr",
+                      "typeString": "string memory"
+                    }
+                  }
+                ],
+                "id": 321,
+                "kind": "baseConstructorSpecifier",
+                "modifierName": {
+                  "id": 319,
+                  "name": "HasName",
+                  "nameLocations": [
+                    "3105:7:0"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 40,
+                  "src": "3105:7:0"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "3105:13:0"
+              },
+              {
+                "arguments": [
+                  {
+                    "id": 323,
+                    "name": "age",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 317,
+                    "src": "3126:3:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  }
+                ],
+                "id": 324,
+                "kind": "baseConstructorSpecifier",
+                "modifierName": {
+                  "id": 322,
+                  "name": "HasAge",
+                  "nameLocations": [
+                    "3119:6:0"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 61,
+                  "src": "3119:6:0"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "3119:11:0"
+              }
+            ],
+            "name": "",
+            "nameLocation": "-1:-1:-1",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 318,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 315,
+                  "mutability": "mutable",
+                  "name": "name",
+                  "nameLocation": "3089:4:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 327,
+                  "src": "3075:18:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 314,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3075:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 317,
+                  "mutability": "mutable",
+                  "name": "age",
+                  "nameLocation": "3100:3:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 327,
+                  "src": "3095:8:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 316,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3095:4:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3074:30:0"
+            },
+            "returnParameters": {
+              "id": 325,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "3131:0:0"
+            },
+            "scope": 337,
+            "src": "3063:76:0",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "public"
+          },
+          {
+            "baseFunctions": [
+              98
+            ],
+            "body": {
+              "id": 335,
+              "nodeType": "Block",
+              "src": "3208:36:0",
+              "statements": [
+                {
+                  "expression": {
+                    "hexValue": "41776f6f6f2e2e2e",
+                    "id": 333,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "kind": "string",
+                    "lValueRequested": false,
+                    "nodeType": "Literal",
+                    "src": "3226:10:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_stringliteral_32d2ce20405f9bf8ecf7a79539c05742efc7ff1f8e47f7dab7cdc1c1afe49b41",
+                      "typeString": "literal_string \"Awooo...\""
+                    },
+                    "value": "Awooo..."
+                  },
+                  "functionReturnParameters": 332,
+                  "id": 334,
+                  "nodeType": "Return",
+                  "src": "3219:17:0"
+                }
+              ]
+            },
+            "functionSelector": "50d85315",
+            "id": 336,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "speak",
+            "nameLocation": "3156:5:0",
+            "nodeType": "FunctionDefinition",
+            "overrides": {
+              "id": 329,
+              "nodeType": "OverrideSpecifier",
+              "overrides": [],
+              "src": "3176:8:0"
+            },
+            "parameters": {
+              "id": 328,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "3161:2:0"
+            },
+            "returnParameters": {
+              "id": 332,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 331,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 336,
+                  "src": "3193:13:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 330,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3193:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3192:15:0"
+            },
+            "scope": 337,
+            "src": "3147:97:0",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "public"
+          }
+        ],
+        "scope": 396,
+        "src": "3027:220:0",
+        "usedErrors": []
+      },
+      {
+        "abstract": false,
+        "baseContracts": [
+          {
+            "baseName": {
+              "id": 338,
+              "name": "Omnivore",
+              "nameLocations": [
+                "3267:8:0"
+              ],
+              "nodeType": "IdentifierPath",
+              "referencedDeclaration": 259,
+              "src": "3267:8:0"
+            },
+            "id": 339,
+            "nodeType": "InheritanceSpecifier",
+            "src": "3267:8:0"
+          }
+        ],
+        "canonicalName": "Dog",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "fullyImplemented": true,
+        "id": 363,
+        "linearizedBaseContracts": [
+          363,
+          259,
+          61,
+          40,
+          99,
+          19
+        ],
+        "name": "Dog",
+        "nameLocation": "3260:3:0",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 352,
+              "nodeType": "Block",
+              "src": "3350:8:0",
+              "statements": []
+            },
+            "id": 353,
+            "implemented": true,
+            "kind": "constructor",
+            "modifiers": [
+              {
+                "arguments": [
+                  {
+                    "id": 346,
+                    "name": "name",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 341,
+                    "src": "3333:4:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_memory_ptr",
+                      "typeString": "string memory"
+                    }
+                  }
+                ],
+                "id": 347,
+                "kind": "baseConstructorSpecifier",
+                "modifierName": {
+                  "id": 345,
+                  "name": "HasName",
+                  "nameLocations": [
+                    "3325:7:0"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 40,
+                  "src": "3325:7:0"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "3325:13:0"
+              },
+              {
+                "arguments": [
+                  {
+                    "id": 349,
+                    "name": "age",
+                    "nodeType": "Identifier",
+                    "overloadedDeclarations": [],
+                    "referencedDeclaration": 343,
+                    "src": "3346:3:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  }
+                ],
+                "id": 350,
+                "kind": "baseConstructorSpecifier",
+                "modifierName": {
+                  "id": 348,
+                  "name": "HasAge",
+                  "nameLocations": [
+                    "3339:6:0"
+                  ],
+                  "nodeType": "IdentifierPath",
+                  "referencedDeclaration": 61,
+                  "src": "3339:6:0"
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "3339:11:0"
+              }
+            ],
+            "name": "",
+            "nameLocation": "-1:-1:-1",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 344,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 341,
+                  "mutability": "mutable",
+                  "name": "name",
+                  "nameLocation": "3309:4:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 353,
+                  "src": "3295:18:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 340,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3295:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 343,
+                  "mutability": "mutable",
+                  "name": "age",
+                  "nameLocation": "3320:3:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 353,
+                  "src": "3315:8:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_uint256",
+                    "typeString": "uint256"
+                  },
+                  "typeName": {
+                    "id": 342,
+                    "name": "uint",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3315:4:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_uint256",
+                      "typeString": "uint256"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3294:30:0"
+            },
+            "returnParameters": {
+              "id": 351,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "3350:0:0"
+            },
+            "scope": 363,
+            "src": "3283:75:0",
+            "stateMutability": "nonpayable",
+            "virtual": false,
+            "visibility": "public"
+          },
+          {
+            "baseFunctions": [
+              98
+            ],
+            "body": {
+              "id": 361,
+              "nodeType": "Block",
+              "src": "3428:32:0",
+              "statements": [
+                {
+                  "expression": {
+                    "hexValue": "576f6f66",
+                    "id": 359,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "kind": "string",
+                    "lValueRequested": false,
+                    "nodeType": "Literal",
+                    "src": "3446:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_stringliteral_1688e9fb74a1ff0a237d771c61cc59a14c550d44ebc187330e45fb80f98a2199",
+                      "typeString": "literal_string \"Woof\""
+                    },
+                    "value": "Woof"
+                  },
+                  "functionReturnParameters": 358,
+                  "id": 360,
+                  "nodeType": "Return",
+                  "src": "3439:13:0"
+                }
+              ]
+            },
+            "functionSelector": "50d85315",
+            "id": 362,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "speak",
+            "nameLocation": "3375:5:0",
+            "nodeType": "FunctionDefinition",
+            "overrides": {
+              "id": 355,
+              "nodeType": "OverrideSpecifier",
+              "overrides": [],
+              "src": "3395:8:0"
+            },
+            "parameters": {
+              "id": 354,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "3380:2:0"
+            },
+            "returnParameters": {
+              "id": 358,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 357,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 362,
+                  "src": "3413:13:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 356,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3413:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3412:15:0"
+            },
+            "scope": 363,
+            "src": "3366:94:0",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "public"
+          }
+        ],
+        "scope": 396,
+        "src": "3251:213:0",
+        "usedErrors": []
+      },
+      {
+        "abstract": false,
+        "baseContracts": [],
+        "canonicalName": "Farmer",
+        "contractDependencies": [],
+        "contractKind": "contract",
+        "fullyImplemented": true,
+        "id": 395,
+        "linearizedBaseContracts": [
+          395
+        ],
+        "name": "Farmer",
+        "nameLocation": "3479:6:0",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 379,
+              "nodeType": "Block",
+              "src": "3636:50:0",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "id": 376,
+                        "name": "food",
+                        "nodeType": "Identifier",
+                        "overloadedDeclarations": [],
+                        "referencedDeclaration": 367,
+                        "src": "3673:4:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_string_memory_ptr",
+                          "typeString": "string memory"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_string_memory_ptr",
+                          "typeString": "string memory"
+                        }
+                      ],
+                      "expression": {
+                        "arguments": [
+                          {
+                            "id": 373,
+                            "name": "animal",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 365,
+                            "src": "3661:6:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          ],
+                          "id": 372,
+                          "name": "Animal",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 99,
+                          "src": "3654:6:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_type$_t_contract$_Animal_$99_$",
+                            "typeString": "type(contract Animal)"
+                          }
+                        },
+                        "id": 374,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "typeConversion",
+                        "lValueRequested": false,
+                        "nameLocations": [],
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "3654:14:0",
+                        "tryCall": false,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_Animal_$99",
+                          "typeString": "contract Animal"
+                        }
+                      },
+                      "id": 375,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberLocation": "3669:3:0",
+                      "memberName": "eat",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 82,
+                      "src": "3654:18:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_external_view$_t_string_memory_ptr_$returns$_t_string_memory_ptr_$",
+                        "typeString": "function (string memory) view external returns (string memory)"
+                      }
+                    },
+                    "id": 377,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "3654:24:0",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_memory_ptr",
+                      "typeString": "string memory"
+                    }
+                  },
+                  "functionReturnParameters": 371,
+                  "id": 378,
+                  "nodeType": "Return",
+                  "src": "3647:31:0"
+                }
+              ]
+            },
+            "functionSelector": "337612db",
+            "id": 380,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "feed",
+            "nameLocation": "3559:4:0",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 368,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 365,
+                  "mutability": "mutable",
+                  "name": "animal",
+                  "nameLocation": "3572:6:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 380,
+                  "src": "3564:14:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 364,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3564:7:0",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                },
+                {
+                  "constant": false,
+                  "id": 367,
+                  "mutability": "mutable",
+                  "name": "food",
+                  "nameLocation": "3594:4:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 380,
+                  "src": "3580:18:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 366,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3580:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3563:36:0"
+            },
+            "returnParameters": {
+              "id": 371,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 370,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 380,
+                  "src": "3621:13:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 369,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3621:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3620:15:0"
+            },
+            "scope": 395,
+            "src": "3550:136:0",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 393,
+              "nodeType": "Block",
+              "src": "3761:48:0",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [],
+                    "expression": {
+                      "argumentTypes": [],
+                      "expression": {
+                        "arguments": [
+                          {
+                            "id": 388,
+                            "name": "animal",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 382,
+                            "src": "3786:6:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          }
+                        ],
+                        "expression": {
+                          "argumentTypes": [
+                            {
+                              "typeIdentifier": "t_address",
+                              "typeString": "address"
+                            }
+                          ],
+                          "id": 387,
+                          "name": "Animal",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 99,
+                          "src": "3779:6:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_type$_t_contract$_Animal_$99_$",
+                            "typeString": "type(contract Animal)"
+                          }
+                        },
+                        "id": 389,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "kind": "typeConversion",
+                        "lValueRequested": false,
+                        "nameLocations": [],
+                        "names": [],
+                        "nodeType": "FunctionCall",
+                        "src": "3779:14:0",
+                        "tryCall": false,
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_Animal_$99",
+                          "typeString": "contract Animal"
+                        }
+                      },
+                      "id": 390,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": false,
+                      "lValueRequested": false,
+                      "memberLocation": "3794:5:0",
+                      "memberName": "speak",
+                      "nodeType": "MemberAccess",
+                      "referencedDeclaration": 98,
+                      "src": "3779:20:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_external_view$__$returns$_t_string_memory_ptr_$",
+                        "typeString": "function () view external returns (string memory)"
+                      }
+                    },
+                    "id": 391,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "nameLocations": [],
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "3779:22:0",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_memory_ptr",
+                      "typeString": "string memory"
+                    }
+                  },
+                  "functionReturnParameters": 386,
+                  "id": 392,
+                  "nodeType": "Return",
+                  "src": "3772:29:0"
+                }
+              ]
+            },
+            "functionSelector": "2fee3213",
+            "id": 394,
+            "implemented": true,
+            "kind": "function",
+            "modifiers": [],
+            "name": "speak",
+            "nameLocation": "3703:5:0",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 383,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 382,
+                  "mutability": "mutable",
+                  "name": "animal",
+                  "nameLocation": "3717:6:0",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 394,
+                  "src": "3709:14:0",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_address",
+                    "typeString": "address"
+                  },
+                  "typeName": {
+                    "id": 381,
+                    "name": "address",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3709:7:0",
+                    "stateMutability": "nonpayable",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_address",
+                      "typeString": "address"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3708:16:0"
+            },
+            "returnParameters": {
+              "id": 386,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 385,
+                  "mutability": "mutable",
+                  "name": "",
+                  "nameLocation": "-1:-1:-1",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 394,
+                  "src": "3746:13:0",
+                  "stateVariable": false,
+                  "storageLocation": "memory",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_string_memory_ptr",
+                    "typeString": "string"
+                  },
+                  "typeName": {
+                    "id": 384,
+                    "name": "string",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "3746:6:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_string_storage_ptr",
+                      "typeString": "string"
+                    }
+                  },
+                  "visibility": "internal"
+                }
+              ],
+              "src": "3745:15:0"
+            },
+            "scope": 395,
+            "src": "3694:115:0",
+            "stateMutability": "view",
+            "virtual": false,
+            "visibility": "public"
+          }
+        ],
+        "scope": 396,
+        "src": "3470:342:0",
+        "usedErrors": []
+      }
+    ],
+    "src": "0:3816:0"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.8.18+commit.87f61d96.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "3.4.11",
+  "updatedAt": "2023-02-17T12:51:22.912Z",
+  "devdoc": {
+    "kind": "dev",
+    "methods": {},
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  }
+}
